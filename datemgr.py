@@ -2,7 +2,7 @@ import datetime as dt
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
 from dateutil import rrule
-from nsetools.errors import DateFormatError
+from errors import DateFormatError
 
 
 def get_nearest_business_day(d):

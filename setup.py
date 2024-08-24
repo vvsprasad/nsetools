@@ -37,9 +37,10 @@ For complete documenation, please refer http://nsetools.readthedocs.io
 
 setup(
     name="nsetools",
-    version="1.0.11",
-    author="Vivek Jha",
-    author_email="vsjha18@gmail.com",
+    version="1.0.12",
+    author="Siva Prasad",
+    author_email="sivaprasad.cs51@gmail.com",
+    # author_email="vsjha18@gmail.com",
     description="Python library for extracting realtime data from National Stock Exchange",
     license="MIT",
     keywords="nse quote market",

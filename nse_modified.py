@@ -22,21 +22,20 @@
     SOFTWARE.
 
 """
-import ast
+import ast 
 import re
 import json
 import zipfile
 import io
 import requests
 from dateutil import parser
-from datetime import datetime as dt, datetime, timedelta 
+from datetime import datetime as dt 
 from nsetools.bases import AbstractBaseExchange
 from nsetools.utils import byte_adaptor
 from nsetools.utils import js_adaptor
 from nsetools.utils import byte_adaptor, js_adaptor
-import urllib.request
-from datemgr import mkdate
-from subnse import SubNse
+# from nsetools.datemgr import mkdate
+from datetime import datetime, timedelta
 
 class Nse(AbstractBaseExchange):
     """
@@ -51,8 +50,7 @@ class Nse(AbstractBaseExchange):
         self.create_session()
         self.get_quote_url = "https://www.nseindia.com/get-quotes/equity?symbol={code}"
         self.stocks_csv_url = 'http://www1.nseindia.com/content/equities/EQUITY_L.csv'
-        # self.top_gainer_url = 'http://www1.nseindia.com/live_market/dynaContent/live_analysis/gainers/niftyGainers1.json'
-        self.top_gainer_url = 'https://www.nseindia.com/market-data/live-equity-market#live-gainers'
+        self.top_gainer_url = 'http://www1.nseindia.com/live_market/dynaContent/live_analysis/gainers/niftyGainers1.json'
         self.top_loser_url = 'http://www1.nseindia.com/live_market/dynaContent/live_analysis/losers/niftyLosers1.json'
         self.top_fno_gainer_url\
             = 'https://www1.nseindia.com/live_market/dynaContent/live_analysis/gainers/fnoGainers1.json'
@@ -70,8 +68,6 @@ class Nse(AbstractBaseExchange):
         self.preopen_niftybank_url =\
             "https://www1.nseindia.com/live_market/dynaContent/live_analysis/pre_open/niftybank.json"
         self.fno_lot_size_url = "https://www1.nseindia.com/content/fo/fo_mktlots.csv"
-        self.opener = urllib.request.build_opener()  # Properly initialize opener
-        # self.opener = urllib3.request.build_opener()  # Properly initialize opener
 
     def get_fno_lot_sizes(self, cached=True, as_json=False):
         """
@@ -166,21 +162,6 @@ class Nse(AbstractBaseExchange):
         # clean the output and make appropriate type conversions
         res_list = [self.clean_server_response(item) for item in res_dict['data']]
         return self.render_response(res_list, as_json)
-
-    # def get_top_gainers(self, as_json=False):
-    #     """
-    #     Fetches the top gainers from the NSE website.
-    #     :param as_json: If True, returns the data as JSON.
-    #     :return: List of top gainers or JSON data.
-    #     """
-    #     url = self.top_gainers_url
-    #     req = urllib.request.Request(url, None, {'User-Agent': 'Mozilla/5.0'})
-    #     response = self.opener.open(req)
-    #     data = response.read()
-    #     if as_json:
-    #         import json
-    #         return json.loads(data)
-    #     return data
 
     def get_top_losers(self, as_json=False):
         """
@@ -355,7 +336,9 @@ class Nse(AbstractBaseExchange):
 
     def get_bhavcopy_url(self, d):
         """take date and return bhavcopy url"""
-        d = mkdate(d)
+        # d = mkdate(d)
+        d = datetime.strptime(d, '%Y-%m-%d').date()
+        d = d - timedelta(days=2)
         day_of_month = d.strftime("%d")
         mon = d.strftime("%b").upper()
         year = d.year
@@ -363,7 +346,9 @@ class Nse(AbstractBaseExchange):
         return url
 
     def get_bhavcopy_filename(self, d):
-        d = mkdate(d)
+        # d = mkdate(d)
+        d = datetime.strptime(d, '%Y-%m-%d').date()
+        d = d - timedelta(days=2)
         day_of_month = d.strftime("%d")
         mon = d.strftime("%b").upper()
         year = d.year
@@ -390,25 +375,25 @@ class Nse(AbstractBaseExchange):
         pass
 
     def create_session(self):
-        home_url = "https://www.nseindia.com"
+        home_url = "https://nseindia.com"
         self._session = requests.Session()
         self._session.headers.update(self.nse_headers())
         self._session.get(home_url)
-        print(dt.now())
-        # d = dt.now()
-        # d = datetime.strptime(d, '%Y-%m-%d').date()
-        # d = d - timedelta(days=1)
         self._session_init_time = dt.now()
         
     
     def fetch(self, url):
+        print(self._session_init_time)
+        print(dt.now())
         time_diff = dt.now() - self._session_init_time
-        print(time_diff.seconds)
-        if time_diff.seconds < self.session_refresh_interval:
+        # if time_diff.seconds < self.session_refresh_interval:
+        one_day = timedelta(days=2)
+        print(one_day)
+        if time_diff > one_day:
             print("time diff is ", time_diff.seconds)
             return self._session.get(url)
         else:
-            print("time diff is ", time_diff.seconds)
+            print("time diff is ::: ", time_diff.seconds)
             print("re-initing the session because of expiry")
             self.create_session()
             return self._session.get(url)
@@ -425,22 +410,7 @@ class Nse(AbstractBaseExchange):
 if __name__ == "__main__":
     n = Nse()
     # data = n.download_bhavcopy("14th Dec")
-    # n.get_quote('HCLTECH')
-
-    q = n.get_quote('COCHINSHIP', all_data=True)    
-    # sc = n.get_stock_codes(as_json=True)
-
-    from pprint import pprint
-    pprint(q)    
-    # pprint(sc)
-
-    # nse = Nse()
-    # top_gainers = nse.get_top_gainers()
-    # print(top_gainers)
-
-    subnse = SubNse()   
-    subnse.test()
-    
+    n.get_quote('reliance')
 
 # TODO: get_most_active()
 # TODO: get_top_volume()

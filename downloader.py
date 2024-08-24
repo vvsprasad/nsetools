@@ -27,7 +27,7 @@ import os
 import zipfile
 import datetime as dt
 from urllib.request import Request
-from nsetools.datemgr import mkdate, usable_date, get_date_range
+from datemgr import mkdate, usable_date, get_date_range
 from nsetools import Nse
 from abc import ABCMeta, abstractmethod
 
@@ -110,7 +110,7 @@ class BhavcopyFileSystemDownloader(BaseBhavcopyDownloader):
 
 
 if __name__ == '__main__':
-    b = BhavcopyFileSystemDownloader(directory="/tmp/bhavcopy", from_date="01-01-2018")
+    b = BhavcopyFileSystemDownloader(directory="bhavcopy", from_date="01-01-2018")
     b.download()
 
 # https://stackoverflow.com/questions/49183801/ssl-certificate-verify-failed-with-urllib
